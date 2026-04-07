@@ -9,7 +9,12 @@ const { project } = Astro.props;
 const { title, description, tags, github, url } = project.data;
 ---
 
-<article class="group flex flex-col gap-3 p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-[var(--color-accent)] transition-colors">
+<article class="group relative flex flex-col gap-3 p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-[var(--color-accent)] transition-colors">
+  <!-- Stretched link — makes the whole card click to the project page -->
+  <a href={`/projects/${project.id}`} class="absolute inset-0 rounded-xl">
+    <span class="sr-only">View {title}</span>
+  </a>
+
   <div>
     <h2 class="font-semibold text-base mb-1 group-hover:text-[var(--color-accent)] transition-colors">
       {title}
@@ -25,7 +30,7 @@ const { title, description, tags, github, url } = project.data;
     ))}
   </div>
 
-  <div class="flex gap-3 text-sm">
+  <div class="relative z-10 flex gap-3 text-sm">
     <a
       href={github}
       target="_blank"
