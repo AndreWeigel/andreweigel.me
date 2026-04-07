@@ -19,6 +19,13 @@ const { title, description = "André Weigel — developer & photographer based i
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <!-- Apply theme before paint to avoid flash -->
+    <script is:inline>
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />

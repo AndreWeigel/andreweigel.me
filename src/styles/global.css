@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@fontsource-variable/sono";
 
+/* Enable class-based dark mode (adds .dark to <html>) */
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Sono Variable", ui-sans-serif, system-ui, sans-serif;
 
