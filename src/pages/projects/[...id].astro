@@ -1,0 +1,61 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { title, description, tags, github, url } = project.data;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${title} — André Weigel`} description={description}>
+  <article class="py-8">
+    <a href="/projects" class="text-sm text-neutral-500 hover:text-[var(--color-accent)] transition-colors mb-8 block">
+      ← All projects
+    </a>
+
+    <header class="mb-8">
+      <div class="flex flex-wrap gap-2 mb-4">
+        {tags.map((tag) => (
+          <span class="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">
+            {tag}
+          </span>
+        ))}
+      </div>
+      <h1 class="text-3xl font-semibold mb-3">{title}</h1>
+      <p class="text-neutral-600 dark:text-neutral-400">{description}</p>
+
+      <div class="flex gap-4 mt-6">
+        <a
+          href={github}
+          target="_blank"
+          rel="noopener"
+          class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:bg-[var(--color-accent-dark)] transition-colors"
+        >
+          View on GitHub →
+        </a>
+        {url && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener"
+            class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 text-sm font-medium hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+          >
+            Live site →
+          </a>
+        )}
+      </div>
+    </header>
+
+    <div class="prose prose-neutral dark:prose-invert max-w-none">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,25 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogPostCard from "../../components/BlogPostCard.astro";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+const sorted = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Blog — André Weigel" description="Writings on software, self-hosting, and photography.">
+  <div class="py-8">
+    <h1 class="text-3xl font-semibold mb-2">Blog</h1>
+    <p class="text-neutral-500 dark:text-neutral-400 mb-10">
+      Thoughts on software, self-hosting, and the occasional detour.
+    </p>
+
+    {sorted.length === 0 ? (
+      <p class="text-neutral-500 dark:text-neutral-400">No posts yet — check back soon.</p>
+    ) : (
+      <div>
+        {sorted.map((post) => <BlogPostCard post={post} />)}
+      </div>
+    )}
+  </div>
+</BaseLayout>

@@ -1,0 +1,33 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const projects = await getCollection("projects");
+const sorted = projects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Projects — André Weigel" description="Things I've built — side projects, tools, and experiments.">
+  <div class="py-8">
+    <h1 class="text-3xl font-semibold mb-2">Projects</h1>
+    <p class="text-neutral-500 dark:text-neutral-400 mb-10">
+      Side projects, tools, and experiments. Most things live on{" "}
+      <a
+        href="https://github.com/AndreWeigel"
+        target="_blank"
+        rel="noopener"
+        class="text-[var(--color-accent)] hover:underline"
+      >
+        GitHub
+      </a>.
+    </p>
+
+    {sorted.length === 0 ? (
+      <p class="text-neutral-500 dark:text-neutral-400">No projects yet.</p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {sorted.map((project) => <ProjectCard project={project} />)}
+      </div>
+    )}
+  </div>
+</BaseLayout>

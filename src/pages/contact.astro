@@ -1,0 +1,54 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const links = [
+  {
+    label: "Email",
+    href: "mailto:hello@andreweigel.me",
+    // TODO: Update to your actual email address
+    display: "hello@andreweigel.me",
+    icon: "✉",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/AndreWeigel",
+    display: "github.com/AndreWeigel",
+    icon: "⌥",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/a-weigel/",
+    display: "linkedin.com/in/a-weigel",
+    icon: "↗",
+  },
+];
+---
+
+<BaseLayout title="Contact — André Weigel" description="Get in touch with André Weigel.">
+  <div class="py-8">
+    <h1 class="text-3xl font-semibold mb-4">Contact</h1>
+    <p class="text-neutral-600 dark:text-neutral-400 mb-12 max-w-md">
+      <!-- TODO: Personalise your contact blurb -->
+      The best way to reach me is by email. I'm also on GitHub and LinkedIn if you'd prefer to connect there.
+    </p>
+
+    <div class="space-y-4">
+      {links.map(({ label, href, display, icon }) => (
+        <a
+          href={href}
+          target={href.startsWith("mailto") ? undefined : "_blank"}
+          rel={href.startsWith("mailto") ? undefined : "noopener"}
+          class="group flex items-center gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-[var(--color-accent)] transition-colors"
+        >
+          <span class="text-lg w-8 text-center text-neutral-400 group-hover:text-[var(--color-accent)] transition-colors">
+            {icon}
+          </span>
+          <div>
+            <p class="text-xs text-neutral-400 dark:text-neutral-500 mb-0.5">{label}</p>
+            <p class="text-sm font-medium group-hover:text-[var(--color-accent)] transition-colors">{display}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,93 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const skills = [
+  { category: "Languages", items: ["Python", "TypeScript", "JavaScript"] },
+  { category: "Backend", items: ["FastAPI", "Flask", "Node.js"] },
+  { category: "Frontend", items: ["Astro", "React", "Tailwind CSS"] },
+  { category: "Infrastructure", items: ["Docker", "Nginx", "Linux", "Hetzner"] },
+  { category: "Data", items: ["PostgreSQL", "AWS", "pandas"] },
+];
+---
+
+<BaseLayout title="About — André Weigel" description="About André Weigel — developer and photographer based in Germany.">
+  <div class="py-8">
+    <h1 class="text-3xl font-semibold mb-10">About</h1>
+
+    <!-- Bio -->
+    <section class="mb-12">
+      <!-- TODO: Add your photo — place it at public/images/photo.jpg and uncomment below -->
+      <!--
+      <img
+        src="/images/photo.jpg"
+        alt="André Weigel"
+        class="w-28 h-28 rounded-full object-cover mb-8 grayscale hover:grayscale-0 transition-all"
+      />
+      -->
+
+      <div class="space-y-4 text-neutral-700 dark:text-neutral-300 leading-relaxed">
+        <!-- TODO: Replace with your own bio -->
+        <p>
+          Hey, I'm André — a developer and photographer based in Germany, originally from Portugal and Brazil.
+          I'm interested in building useful software, self-hosting infrastructure, and keeping things simple.
+        </p>
+        <p>
+          I spend a lot of time thinking about privacy, open source software, and how to own my own data.
+          When I'm not in front of a screen, I'm usually behind a camera — mostly analog.
+        </p>
+        <p>
+          <!-- TODO: Fill in your current role / what you're working on -->
+          Currently working on: <span class="text-[var(--color-accent)]"><!-- your focus here --></span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold mb-6">Skills & tools</h2>
+      <div class="space-y-4">
+        {skills.map(({ category, items }) => (
+          <div class="flex flex-col sm:flex-row sm:items-baseline gap-2">
+            <span class="text-sm text-neutral-500 dark:text-neutral-400 sm:w-32 shrink-0">{category}</span>
+            <div class="flex flex-wrap gap-1.5">
+              {items.map((item) => (
+                <span class="text-sm px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Photography -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold mb-4">Photography</h2>
+      <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+        I shoot mostly film — 35mm and medium format. You can find my photos at{" "}
+        <a
+          href="https://photos.andreweigel.me"
+          target="_blank"
+          rel="noopener"
+          class="text-[var(--color-accent)] hover:underline"
+        >
+          photos.andreweigel.me
+        </a>.
+        <!-- TODO: Update if the URL is different, or remove if not ready yet -->
+      </p>
+    </section>
+
+    <!-- Interests -->
+    <section>
+      <h2 class="text-lg font-semibold mb-4">Interests</h2>
+      <ul class="space-y-2 text-neutral-700 dark:text-neutral-300">
+        <!-- TODO: Personalise this list -->
+        <li>→ Self-hosting & privacy-first software</li>
+        <li>→ Open source</li>
+        <li>→ Analog photography</li>
+        <li>→ Linux & home servers</li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
