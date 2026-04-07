@@ -1,1 +1,23 @@
 @import "tailwindcss";
+@import "@fontsource-variable/sono";
+
+@theme {
+  --font-sans: "Sono Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-accent: #f4694a;
+  --color-accent-light: #f8957e;
+  --color-accent-dark: #d94f30;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+html {
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100;
+}

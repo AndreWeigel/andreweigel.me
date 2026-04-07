@@ -1,0 +1,36 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/projects", label: "Projects" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
+];
+
+const pathname = Astro.url.pathname;
+---
+
+<header class="w-full border-b border-neutral-200 dark:border-neutral-800">
+  <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+    <a href="/" class="font-semibold tracking-tight hover:text-[var(--color-accent)] transition-colors">
+      André Weigel
+    </a>
+    <nav class="flex items-center gap-5 text-sm">
+      {nav.filter(n => n.href !== "/").map(({ href, label }) => (
+        <a
+          href={href}
+          class={`transition-colors hover:text-[var(--color-accent)] ${
+            pathname.startsWith(href)
+              ? "text-[var(--color-accent)]"
+              : "text-neutral-600 dark:text-neutral-400"
+          }`}
+        >
+          {label}
+        </a>
+      ))}
+      <ThemeToggle />
+    </nav>
+  </div>
+</header>

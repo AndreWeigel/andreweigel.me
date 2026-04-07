@@ -1,0 +1,57 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  prev?: CollectionEntry<"blog">;
+  next?: CollectionEntry<"blog">;
+}
+
+const { post, prev, next } = Astro.props;
+const { title, date, description, tags } = post.data;
+
+const readingTime = Math.ceil((post.body ?? "").split(/\s+/).length / 200);
+const formattedDate = date.toLocaleDateString("en-GB", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<BaseLayout title={`${title} — André Weigel`} description={description}>
+  <article>
+    <header class="mb-10">
+      <div class="flex flex-wrap gap-2 mb-4">
+        {tags.map((tag) => (
+          <span class="text-xs px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+            {tag}
+          </span>
+        ))}
+      </div>
+      <h1 class="text-3xl font-semibold mb-3">{title}</h1>
+      <p class="text-sm text-neutral-500 dark:text-neutral-400">
+        {formattedDate} · {readingTime} min read
+      </p>
+    </header>
+
+    <div class="prose prose-neutral dark:prose-invert max-w-none">
+      <slot />
+    </div>
+
+    <nav class="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 flex justify-between gap-4">
+      {prev ? (
+        <a href={`/blog/${prev.id}`} class="group text-sm">
+          <span class="text-neutral-400 block mb-1">← Previous</span>
+          <span class="group-hover:text-[var(--color-accent)] transition-colors">{prev.data.title}</span>
+        </a>
+      ) : <span />}
+      {next ? (
+        <a href={`/blog/${next.id}`} class="group text-sm text-right">
+          <span class="text-neutral-400 block mb-1">Next →</span>
+          <span class="group-hover:text-[var(--color-accent)] transition-colors">{next.data.title}</span>
+        </a>
+      ) : <span />}
+    </nav>
+  </article>
+</BaseLayout>

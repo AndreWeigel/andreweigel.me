@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, date, description, tags } = post.data;
+
+const readingTime = Math.ceil((post.body ?? "").split(/\s+/).length / 200);
+const formattedDate = date.toLocaleDateString("en-GB", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+---
+
+<a href={`/blog/${post.id}`} class="group block py-6 border-b border-neutral-200 dark:border-neutral-800 last:border-0">
+  <div class="flex flex-wrap gap-2 mb-2">
+    {tags.slice(0, 3).map((tag) => (
+      <span class="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">
+        {tag}
+      </span>
+    ))}
+  </div>
+  <h2 class="text-lg font-semibold group-hover:text-[var(--color-accent)] transition-colors mb-1">
+    {title}
+  </h2>
+  <p class="text-neutral-600 dark:text-neutral-400 text-sm mb-2 line-clamp-2">{description}</p>
+  <span class="text-xs text-neutral-400 dark:text-neutral-500">{formattedDate} · {readingTime} min read</span>
+</a>
