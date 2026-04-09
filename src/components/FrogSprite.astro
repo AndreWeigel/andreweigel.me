@@ -1,0 +1,92 @@
+---
+// Frame data parsed from frog.json
+const idleFrames = [
+  { x: 0,   duration: 900 },
+  { x: 32,  duration: 530 },
+];
+
+const croakFrames = [
+  { x: 64,  duration: 530 },
+  { x: 96,  duration: 200 },
+  { x: 128, duration: 100 },
+  { x: 160, duration: 100 },
+  { x: 192, duration: 100 },
+  { x: 224, duration: 200 },
+  { x: 256, duration: 200 },
+  { x: 288, duration: 100 },
+  { x: 320, duration: 100 },
+  { x: 352, duration: 200 },
+  { x: 384, duration: 200 },
+];
+---
+
+<a href="/" aria-label="Home">
+  <div
+    id="frog-sprite"
+    style="width:64px;height:64px;background-image:url('/images/frog/frog.png');background-size:832px 64px;background-repeat:no-repeat;image-rendering:pixelated;cursor:pointer;flex-shrink:0;"
+    title="ribbit"
+  ></div>
+</a>
+
+<script define:vars={{ idleFrames, croakFrames }}>
+  function initFrog() {
+    const el = document.getElementById("frog-sprite");
+    if (!el) return;
+
+    // state: "idle" | "croak" | "croak-finishing"
+    let state = "idle";
+    let frameIndex = 0;
+    let timeout = null;
+
+    function setFrame(x) {
+      el.style.backgroundPosition = `-${x * 2}px 0px`;
+    }
+
+    function tick() {
+      if (timeout) clearTimeout(timeout);
+
+      if (state === "idle") {
+        const frame = idleFrames[frameIndex % idleFrames.length];
+        setFrame(frame.x);
+        timeout = setTimeout(() => {
+          frameIndex = (frameIndex + 1) % idleFrames.length;
+          tick();
+        }, frame.duration);
+      } else {
+        // croak or croak-finishing
+        const frame = croakFrames[frameIndex];
+        setFrame(frame.x);
+        timeout = setTimeout(() => {
+          frameIndex++;
+          if (frameIndex >= croakFrames.length) {
+            frameIndex = 0;
+            if (state === "croak-finishing") {
+              state = "idle";
+              frameIndex = 0;
+            }
+            // if still "croak" (still hovering), loop croak from start
+          }
+          tick();
+        }, frame.duration);
+      }
+    }
+
+    el.addEventListener("mouseenter", () => {
+      state = "croak";
+      frameIndex = 0;
+      tick();
+    });
+
+    el.addEventListener("mouseleave", () => {
+      if (state === "croak") {
+        state = "croak-finishing";
+      }
+    });
+
+    tick();
+  }
+
+  // Init on first load and after every view transition navigation
+  initFrog();
+  document.addEventListener("astro:page-load", initFrog);
+</script>
