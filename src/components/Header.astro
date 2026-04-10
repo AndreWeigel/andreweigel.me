@@ -1,6 +1,6 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
-import FrogSprite from "./FrogSprite.astro";
+import Sprite from "./Sprite.astro";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -15,7 +15,7 @@ const pathname = Astro.url.pathname;
 
 <header class="w-full border-b border-neutral-200 dark:border-neutral-800">
   <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-    <FrogSprite />
+    <Sprite name="frog2" tag="Idle" hoverTag="Croak" scale={2} href="/" title="Home" />
     <nav class="flex items-center gap-5 text-sm">
       {nav.filter(n => n.href !== "/").map(({ href, label }) => (
         <a

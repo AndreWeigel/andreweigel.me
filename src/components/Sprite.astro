@@ -1,0 +1,108 @@
+---
+import { loadSprite } from "../lib/sprites";
+import type { SpriteFrame } from "../lib/sprites";
+
+interface Props {
+  name: string;
+  tag?: string;       // default animation tag
+  hoverTag?: string;  // animation tag to play on hover
+  scale?: number;
+  href?: string;      // optional link wrapper
+  title?: string;
+}
+
+const { name, tag, hoverTag, scale = 1, href, title } = Astro.props;
+
+const sprite = loadSprite(name);
+
+const defaultFrames: SpriteFrame[] = tag
+  ? (sprite.tags[tag] ?? sprite.frames)
+  : sprite.frames;
+
+const hoverFrames: SpriteFrame[] = hoverTag
+  ? (sprite.tags[hoverTag] ?? [])
+  : [];
+
+const displayW = sprite.frameW * scale;
+const displayH = sprite.frameH * scale;
+const bgW = sprite.sheetW * scale;
+const bgH = sprite.sheetH * scale;
+
+const id = `sprite-${name}-${Math.random().toString(36).slice(2, 7)}`;
+---
+
+{href ? (
+  <a href={href} aria-label={title ?? name}>
+    <div
+      id={id}
+      style={`width:${displayW}px;height:${displayH}px;background-image:url('/images/sprites/${name}.png');background-size:${bgW}px ${bgH}px;background-repeat:no-repeat;image-rendering:pixelated;cursor:pointer;flex-shrink:0;`}
+      title={title}
+    ></div>
+  </a>
+) : (
+  <div
+    id={id}
+    style={`width:${displayW}px;height:${displayH}px;background-image:url('/images/sprites/${name}.png');background-size:${bgW}px ${bgH}px;background-repeat:no-repeat;image-rendering:pixelated;flex-shrink:0;`}
+    title={title}
+  ></div>
+)}
+
+<script define:vars={{ id, defaultFrames, hoverFrames, scale }}>
+  function initSprite() {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const hasHover = hoverFrames.length > 0;
+    let state = "default";
+    let frameIndex = 0;
+    let timeout = null;
+
+    function setFrame(x) {
+      el.style.backgroundPosition = `-${x * scale}px 0px`;
+    }
+
+    function tick() {
+      if (timeout) clearTimeout(timeout);
+
+      if (state === "default") {
+        const frame = defaultFrames[frameIndex % defaultFrames.length];
+        setFrame(frame.x);
+        timeout = setTimeout(() => {
+          frameIndex = (frameIndex + 1) % defaultFrames.length;
+          tick();
+        }, frame.duration);
+      } else {
+        // "hover" or "hover-finishing"
+        const frame = hoverFrames[frameIndex];
+        setFrame(frame.x);
+        timeout = setTimeout(() => {
+          frameIndex++;
+          if (frameIndex >= hoverFrames.length) {
+            frameIndex = 0;
+            if (state === "hover-finishing") {
+              state = "default";
+              frameIndex = 0;
+            }
+          }
+          tick();
+        }, frame.duration);
+      }
+    }
+
+    if (hasHover) {
+      el.addEventListener("mouseenter", () => {
+        state = "hover";
+        frameIndex = 0;
+        tick();
+      });
+      el.addEventListener("mouseleave", () => {
+        if (state === "hover") state = "hover-finishing";
+      });
+    }
+
+    tick();
+  }
+
+  initSprite();
+  document.addEventListener("astro:page-load", initSprite);
+</script>
