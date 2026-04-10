@@ -1,0 +1,135 @@
+---
+import { loadSprite } from "../lib/sprites";
+import type { SpriteFrame } from "../lib/sprites";
+
+interface LayerProp {
+  name?: string;           // single sprite
+  names?: string[];        // multiple sprites — click cycles through them
+  tag?: string;
+  hoverTag?: string;
+  clickable?: boolean;     // shorthand when using names[]
+}
+
+interface Props {
+  layers: LayerProp[];
+  scale?: number;
+  href?: string;
+  title?: string;
+}
+
+const { layers, scale = 1, href, title } = Astro.props;
+
+const loaded = layers.map((l) => {
+  const names = l.names ?? (l.name ? [l.name] : []);
+  // Load frame data from first name (all must share same layout)
+  const sprite = loadSprite(names[0]);
+  const defaultFrames: SpriteFrame[] = l.tag
+    ? (sprite.tags[l.tag] ?? sprite.frames)
+    : sprite.frames;
+  const hoverFrames: SpriteFrame[] = l.hoverTag
+    ? (sprite.tags[l.hoverTag] ?? defaultFrames)
+    : defaultFrames;
+  return {
+    names,
+    clickable: !!(l.clickable || (l.names && l.names.length > 1)),
+    defaultFrames,
+    hoverFrames,
+    sheetW: sprite.sheetW,
+    sheetH: sprite.sheetH,
+  };
+});
+
+const first = loaded[0];
+const displayW = first.sheetH * scale;
+const displayH = first.sheetH * scale;
+
+const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+{href ? (
+  <a href={href} aria-label={title ?? ""} id={id} style={`position:relative;display:inline-block;width:${displayW}px;height:${displayH}px;cursor:pointer;flex-shrink:0;`}>
+    {loaded.map((l, i) => (
+      <div data-layer={i} style={`position:absolute;inset:0;width:${displayW}px;height:${displayH}px;background-image:url('/images/sprites/${l.names[0]}.png');background-size:${l.sheetW * scale}px ${l.sheetH * scale}px;background-repeat:no-repeat;image-rendering:pixelated;z-index:${i};`}></div>
+    ))}
+  </a>
+) : (
+  <div id={id} style={`position:relative;display:inline-block;width:${displayW}px;height:${displayH}px;flex-shrink:0;${loaded.some(l => l.clickable) ? "cursor:pointer;" : ""}`}>
+    {loaded.map((l, i) => (
+      <div data-layer={i} style={`position:absolute;inset:0;width:${displayW}px;height:${displayH}px;background-image:url('/images/sprites/${l.names[0]}.png');background-size:${l.sheetW * scale}px ${l.sheetH * scale}px;background-repeat:no-repeat;image-rendering:pixelated;z-index:${i};`}></div>
+    ))}
+  </div>
+)}
+
+<script define:vars={{ id, loaded, scale }}>
+  function initLayeredSprite() {
+    const wrapper = document.getElementById(id);
+    if (!wrapper) return;
+
+    const layerEls = Array.from(wrapper.querySelectorAll("[data-layer]"));
+    if (!layerEls.length) return;
+
+    // Per-layer name index for clickable layers
+    const nameIndexes = loaded.map(() => 0);
+
+    let state = "default";
+    let frameIndex = 0;
+    let timeout = null;
+
+    function masterFrames() {
+      return state === "hover" || state === "hover-finishing"
+        ? loaded[0].hoverFrames
+        : loaded[0].defaultFrames;
+    }
+
+    function setFrame(index) {
+      layerEls.forEach((el, i) => {
+        const layer = loaded[i];
+        const frames = state === "default" || state === "hover-finishing"
+          ? layer.defaultFrames
+          : layer.hoverFrames;
+        const frame = frames[index % frames.length];
+        el.style.backgroundPosition = `-${frame.x * scale}px 0px`;
+      });
+    }
+
+    function tick() {
+      if (timeout) clearTimeout(timeout);
+
+      const frames = masterFrames();
+      setFrame(frameIndex % frames.length);
+
+      timeout = setTimeout(() => {
+        frameIndex++;
+        if (frameIndex >= frames.length) {
+          frameIndex = 0;
+          if (state === "hover-finishing") state = "default";
+        }
+        tick();
+      }, frames[frameIndex % frames.length].duration);
+    }
+
+    wrapper.addEventListener("mouseenter", () => {
+      state = "hover";
+      frameIndex = 0;
+      tick();
+    });
+
+    wrapper.addEventListener("mouseleave", () => {
+      if (state === "hover") state = "hover-finishing";
+    });
+
+    // Click cycles through names on clickable layers
+    wrapper.addEventListener("click", () => {
+      loaded.forEach((layer, i) => {
+        if (!layer.clickable || layer.names.length < 2) return;
+        nameIndexes[i] = (nameIndexes[i] + 1) % layer.names.length;
+        layerEls[i].style.backgroundImage = `url('/images/sprites/${layer.names[nameIndexes[i]]}.png')`;
+      });
+    });
+
+    tick();
+  }
+
+  initLayeredSprite();
+  document.addEventListener("astro:page-load", initLayeredSprite);
+</script>

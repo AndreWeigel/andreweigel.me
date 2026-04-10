@@ -1,30 +1,30 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import BlogPostCard from "../components/BlogPostCard.astro";
-import ProjectCard from "../components/ProjectCard.astro";
-
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-const recentPosts = allPosts
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
-
-const allProjects = await getCollection("projects");
-const featuredProjects = allProjects
-  .filter((p) => p.data.featured)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
+import LayeredSprite from "../components/LayeredSprite.astro";
 ---
 
 <BaseLayout title="André Weigel">
-  <!-- Hero -->
-  <section class="py-16 border-b border-neutral-200 dark:border-neutral-800">
-    <p class="text-sm text-[var(--color-accent)] font-medium mb-3 uppercase tracking-widest">Hello, I'm</p>
-    <h1 class="text-4xl font-semibold mb-4">André Weigel</h1>
-    <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-xl">
-      <!-- TODO: Write your one-liner here -->
-      Developer & photographer based in Germany. I build things, self-host stuff, and occasionally shoot film.
-    </p>
+  <section class="py-16">
+    <div class="flex items-start gap-8">
+      <div class="shrink-0 hidden sm:block">
+        <LayeredSprite
+          layers={[
+            { name: "andre_head", tag: "idle", hoverTag: "tongue" },
+            { name: "andre_tongue", tag: "idle", hoverTag: "tongue" },
+            { names: ["andre_cap_blue", "andre_cap_bege", "andre_hat_black", "andre_fez","andre_no_hat"], tag: "idle", hoverTag: "tongue" },
+          ]}
+          scale={3}
+        />
+      </div>
+      <div>
+        <p class="text-sm text-[var(--color-accent)] font-medium mb-3 uppercase tracking-widest">Hello, I'm</p>
+        <h1 class="text-4xl font-semibold mb-4">André Weigel</h1>
+        <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-xl">
+          <!-- TODO: Write your one-liner here -->
+          Developer & photographer based in Germany. I build things, self-host stuff, and occasionally shoot film.
+        </p>
+      </div>
+    </div>
     <div class="flex gap-4 mt-8">
       <a href="/about" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:bg-[var(--color-accent-dark)] transition-colors">
         About me
@@ -34,30 +34,4 @@ const featuredProjects = allProjects
       </a>
     </div>
   </section>
-
-  <!-- Recent Posts -->
-  {recentPosts.length > 0 && (
-    <section class="py-12 border-b border-neutral-200 dark:border-neutral-800">
-      <div class="flex items-baseline justify-between mb-6">
-        <h2 class="text-lg font-semibold">Recent posts</h2>
-        <a href="/blog" class="text-sm text-neutral-500 hover:text-[var(--color-accent)] transition-colors">All posts →</a>
-      </div>
-      <div>
-        {recentPosts.map((post) => <BlogPostCard post={post} />)}
-      </div>
-    </section>
-  )}
-
-  <!-- Featured Projects -->
-  {featuredProjects.length > 0 && (
-    <section class="py-12">
-      <div class="flex items-baseline justify-between mb-6">
-        <h2 class="text-lg font-semibold">Featured projects</h2>
-        <a href="/projects" class="text-sm text-neutral-500 hover:text-[var(--color-accent)] transition-colors">All projects →</a>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {featuredProjects.map((project) => <ProjectCard project={project} />)}
-      </div>
-    </section>
-  )}
 </BaseLayout>
