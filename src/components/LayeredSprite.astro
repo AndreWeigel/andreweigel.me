@@ -68,8 +68,19 @@ const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
     const layerEls = Array.from(wrapper.querySelectorAll("[data-layer]"));
     if (!layerEls.length) return;
 
-    // Per-layer name index for clickable layers
-    const nameIndexes = loaded.map(() => 0);
+    // Per-layer name index for clickable layers — randomize on load
+    const nameIndexes = loaded.map((layer) =>
+      layer.clickable && layer.names.length > 1
+        ? Math.floor(Math.random() * layer.names.length)
+        : 0
+    );
+
+    // Apply initial random hat
+    layerEls.forEach((el, i) => {
+      if (loaded[i].clickable) {
+        el.style.backgroundImage = `url('/images/sprites/${loaded[i].names[nameIndexes[i]]}.png')`;
+      }
+    });
 
     let state = "default";
     let frameIndex = 0;

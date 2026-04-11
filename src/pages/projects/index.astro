@@ -2,32 +2,163 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
+import { loadSprite } from "../../lib/sprites";
 
 const projects = await getCollection("projects");
 const sorted = projects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const work = sorted.filter((p) => p.data.type === "work");
+const play = sorted.filter((p) => p.data.type === "play");
+
+const frog = loadSprite("frog2");
+const idleFrames = frog.tags["Idle"];
+const croakFrames = frog.tags["Croak"];
+const jumpFrames = frog.tags["Jump"];
+const jumpDuration = jumpFrames.reduce((sum, f) => sum + f.duration, 0);
+// Wind-up: first 3 frames (14-16), airborne: frames 17-21 (indices 3-7 within tag)
+const jumpWindup = jumpFrames.slice(0, 3).reduce((sum, f) => sum + f.duration, 0);
+const jumpAirborne = jumpFrames.slice(3, 8).reduce((sum, f) => sum + f.duration, 0);
+const scale = 2;
+const bgW = frog.sheetW * scale;
+const bgH = frog.frameH * scale;
+const frameSize = frog.frameH * scale;
 ---
 
-<BaseLayout title="Projects — André Weigel" description="Things I've built — side projects, tools, and experiments.">
+<BaseLayout title="Projects — André Weigel" description="Things I've built and made.">
   <div class="py-8">
     <h1 class="text-3xl font-semibold mb-2">Projects</h1>
-    <p class="text-neutral-500 dark:text-neutral-400 mb-10">
-      Side projects, tools, and experiments. Most things live on{" "}
-      <a
-        href="https://github.com/AndreWeigel"
-        target="_blank"
-        rel="noopener"
-        class="text-[var(--color-accent)] hover:underline"
-      >
-        GitHub
-      </a>.
-    </p>
+    <p class="text-neutral-500 dark:text-neutral-400 mb-8">Things I've built and made.</p>
 
-    {sorted.length === 0 ? (
-      <p class="text-neutral-500 dark:text-neutral-400">No projects yet.</p>
-    ) : (
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {sorted.map((project) => <ProjectCard project={project} />)}
+    <!-- Frog toggle -->
+    <div id="frog-toggle-area" style={`position:relative;display:flex;align-items:flex-end;gap:2rem;margin-bottom:2.5rem;user-select:none;height:${frameSize + 28}px;`}>
+      <!-- frog lives here absolutely, JS moves it -->
+      <div
+        id="frog-sprite"
+        style={`position:absolute;bottom:24px;left:0;width:${frameSize}px;height:${frameSize}px;background-image:url('/images/sprites/frog2.png');background-size:${bgW}px ${bgH}px;background-repeat:no-repeat;image-rendering:pixelated;`}
+      ></div>
+      <!-- labels stay in normal flow, give us anchor positions -->
+      <div id="btn-work" style={`display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:${frameSize}px;`}>
+        <div style={`height:${frameSize}px;`}></div>
+        <span id="label-work" class="text-sm font-medium text-neutral-900 dark:text-neutral-100 transition-colors">Work</span>
       </div>
-    )}
+      <div id="btn-play" style={`display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:${frameSize}px;`}>
+        <div style={`height:${frameSize}px;`}></div>
+        <span id="label-play" class="text-sm font-medium text-neutral-500 dark:text-neutral-400 transition-colors">Play</span>
+      </div>
+    </div>
+
+    <!-- Work projects -->
+    <div id="tab-work">
+      {work.length === 0 ? (
+        <p class="text-neutral-500 dark:text-neutral-400">No projects yet.</p>
+      ) : (
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {work.map((project) => <ProjectCard project={project} />)}
+        </div>
+      )}
+    </div>
+
+    <!-- Play projects -->
+    <div id="tab-play" style="display:none">
+      {play.length === 0 ? (
+        <p class="text-neutral-500 dark:text-neutral-400">No projects yet — check back soon.</p>
+      ) : (
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {play.map((project) => <ProjectCard project={project} />)}
+        </div>
+      )}
+    </div>
   </div>
 </BaseLayout>
+
+<style>
+  @keyframes frog-jump {
+    0%   { transform: translateX(0) scaleX(var(--frog-dir, 1)); }
+    100% { transform: translateX(var(--frog-dx, 0px)) scaleX(var(--frog-dir, 1)); }
+  }
+  .jumping {
+    animation: frog-jump var(--frog-airborne, 340ms) ease-in-out forwards;
+    animation-delay: var(--frog-windup, 220ms);
+  }
+</style>
+
+<script define:vars={{ idleFrames, croakFrames, jumpFrames, jumpDuration, jumpWindup, jumpAirborne, scale, frameSize }}>
+  const sprite = document.getElementById("frog-sprite");
+  const btnWork = document.getElementById("btn-work");
+  const btnPlay = document.getElementById("btn-play");
+  const tabWork = document.getElementById("tab-work");
+  const tabPlay = document.getElementById("tab-play");
+  const labelWork = document.getElementById("label-work");
+  const labelPlay = document.getElementById("label-play");
+
+  let isPlay = false;
+  let isJumping = false;
+  let frameIndex = 0;
+  let timeout = null;
+  let currentLeft = 0;
+
+  function currentFrames() {
+    return isPlay ? croakFrames : idleFrames;
+  }
+
+  function tick() {
+    if (timeout) clearTimeout(timeout);
+    const frames = currentFrames();
+    const frame = frames[frameIndex % frames.length];
+    sprite.style.backgroundPosition = `-${frame.x * scale}px 0px`;
+    timeout = setTimeout(() => {
+      frameIndex = (frameIndex + 1) % frames.length;
+      tick();
+    }, frame.duration);
+  }
+
+  function tickJump(fi) {
+    if (fi >= jumpFrames.length) return;
+    const frame = jumpFrames[fi];
+    sprite.style.backgroundPosition = `-${frame.x * scale}px 0px`;
+    timeout = setTimeout(() => tickJump(fi + 1), frame.duration);
+  }
+
+  function jump(toPlay) {
+    if (isJumping || isPlay === toPlay) return;
+    isJumping = true;
+
+    const targetLeft = toPlay ? btnPlay.offsetLeft : btnWork.offsetLeft;
+    const dx = targetLeft - currentLeft;
+
+    if (timeout) clearTimeout(timeout);
+    tickJump(0);
+
+    sprite.style.setProperty("--frog-dx", dx + "px");
+    sprite.style.setProperty("--frog-dir", dx >= 0 ? "1" : "-1");
+    sprite.style.setProperty("--frog-windup", jumpWindup + "ms");
+    sprite.style.setProperty("--frog-airborne", jumpAirborne + "ms");
+    sprite.classList.add("jumping");
+
+    sprite.addEventListener("animationend", () => {
+      sprite.classList.remove("jumping");
+      sprite.style.transform = "";
+      currentLeft = targetLeft;
+      sprite.style.left = currentLeft + "px";
+
+      labelWork.className = `text-sm font-medium transition-colors ${toPlay ? "text-neutral-500 dark:text-neutral-400" : "text-neutral-900 dark:text-neutral-100"}`;
+      labelPlay.className = `text-sm font-medium transition-colors ${toPlay ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400"}`;
+
+      tabWork.style.display = toPlay ? "none" : "block";
+      tabPlay.style.display = toPlay ? "block" : "none";
+
+      isPlay = toPlay;
+      frameIndex = 0;
+      tick();
+      isJumping = false;
+    }, { once: true });
+  }
+
+  btnWork.addEventListener("click", () => jump(false));
+  btnPlay.addEventListener("click", () => jump(true));
+
+  // Align frog to work button on load
+  currentLeft = btnWork.offsetLeft;
+  sprite.style.left = currentLeft + "px";
+  tick();
+</script>

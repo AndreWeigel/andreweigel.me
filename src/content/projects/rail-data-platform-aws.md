@@ -3,6 +3,7 @@ title: "Rail Data Platform (AWS)"
 description: "A data platform for ingesting, processing, and analysing rail network data — deployed on AWS."
 tags: ["aws", "data-engineering", "python", "etl"]
 github: "https://github.com/AndreWeigel/rail-data-platform-aws"
+type: work
 featured: false
 date: 2025-09-12
 ---

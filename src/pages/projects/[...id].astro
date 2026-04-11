@@ -32,26 +32,30 @@ const { Content } = await render(project);
       <h1 class="text-3xl font-semibold mb-3">{title}</h1>
       <p class="text-neutral-600 dark:text-neutral-400">{description}</p>
 
-      <div class="flex gap-4 mt-6">
-        <a
-          href={github}
-          target="_blank"
-          rel="noopener"
-          class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:bg-[var(--color-accent-dark)] transition-colors"
-        >
-          View on GitHub →
-        </a>
-        {url && (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener"
-            class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 text-sm font-medium hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
-          >
-            Live site →
-          </a>
-        )}
-      </div>
+      {(github || url) && (
+        <div class="flex gap-4 mt-6">
+          {github && (
+            <a
+              href={github}
+              target="_blank"
+              rel="noopener"
+              class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:bg-[var(--color-accent-dark)] transition-colors"
+            >
+              View on GitHub →
+            </a>
+          )}
+          {url && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener"
+              class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 text-sm font-medium hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+            >
+              Live site →
+            </a>
+          )}
+        </div>
+      )}
     </header>
 
     <div class="prose prose-neutral dark:prose-invert max-w-none">
