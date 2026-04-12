@@ -39,11 +39,11 @@ const frameSize = frog.frameH * scale;
       <!-- labels stay in normal flow, give us anchor positions -->
       <div id="btn-work" style={`display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:${frameSize}px;`}>
         <div style={`height:${frameSize}px;`}></div>
-        <span id="label-work" class="text-sm font-medium text-neutral-900 dark:text-neutral-100 transition-colors">Work</span>
+        <span id="label-work" class="text-sm font-medium px-3 py-1 rounded-full transition-colors text-neutral-900 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-800 hover:bg-[var(--color-accent)] hover:text-white">Work</span>
       </div>
       <div id="btn-play" style={`display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:${frameSize}px;`}>
         <div style={`height:${frameSize}px;`}></div>
-        <span id="label-play" class="text-sm font-medium text-neutral-500 dark:text-neutral-400 transition-colors">Play</span>
+        <span id="label-play" class="text-sm font-medium px-3 py-1 rounded-full transition-colors text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">Play</span>
       </div>
     </div>
 
@@ -141,8 +141,11 @@ const frameSize = frog.frameH * scale;
       currentLeft = targetLeft;
       sprite.style.left = currentLeft + "px";
 
-      labelWork.className = `text-sm font-medium transition-colors ${toPlay ? "text-neutral-500 dark:text-neutral-400" : "text-neutral-900 dark:text-neutral-100"}`;
-      labelPlay.className = `text-sm font-medium transition-colors ${toPlay ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400"}`;
+      const base = "text-sm font-medium px-3 py-1 rounded-full transition-colors";
+      const active = "text-neutral-900 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-800 hover:bg-[var(--color-accent)] hover:text-white";
+      const inactive = "text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]";
+      labelWork.className = `${base} ${toPlay ? inactive : active}`;
+      labelPlay.className = `${base} ${toPlay ? active : inactive}`;
 
       tabWork.style.display = toPlay ? "none" : "block";
       tabPlay.style.display = toPlay ? "block" : "none";
