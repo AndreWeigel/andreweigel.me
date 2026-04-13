@@ -95,7 +95,7 @@ const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
     function setFrame(index) {
       layerEls.forEach((el, i) => {
         const layer = loaded[i];
-        const frames = state === "default" || state === "hover-finishing"
+        const frames = state === "default"
           ? layer.defaultFrames
           : layer.hoverFrames;
         const frame = frames[index % frames.length];
