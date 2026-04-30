@@ -64,12 +64,20 @@ const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
 )}
 
 <script define:vars={{ id, loaded, scale }}>
+  let spriteTimeout = null;
+
   function initLayeredSprite() {
     const wrapper = document.getElementById(id);
     if (!wrapper) return;
 
     const layerEls = Array.from(wrapper.querySelectorAll("[data-layer]"));
     if (!layerEls.length) return;
+
+    // Cancel any existing animation loop before starting a new one
+    if (spriteTimeout) {
+      clearTimeout(spriteTimeout);
+      spriteTimeout = null;
+    }
 
     // Per-layer name index for clickable layers — randomize on load from defaultNames only
     const nameIndexes = loaded.map((layer) => {
@@ -87,7 +95,6 @@ const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
 
     let state = "default";
     let frameIndex = 0;
-    let timeout = null;
 
     function masterFrames() {
       return state === "hover" || state === "hover-finishing"
@@ -107,12 +114,12 @@ const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
     }
 
     function tick() {
-      if (timeout) clearTimeout(timeout);
+      if (spriteTimeout) clearTimeout(spriteTimeout);
 
       const frames = masterFrames();
       setFrame(frameIndex % frames.length);
 
-      timeout = setTimeout(() => {
+      spriteTimeout = setTimeout(() => {
         frameIndex++;
         if (frameIndex >= frames.length) {
           frameIndex = 0;
