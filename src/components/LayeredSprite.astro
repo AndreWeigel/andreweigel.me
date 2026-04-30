@@ -5,6 +5,7 @@ import type { SpriteFrame } from "../lib/sprites";
 interface LayerProp {
   name?: string;           // single sprite
   names?: string[];        // multiple sprites — click cycles through them
+  defaultNames?: string[]; // subset of names shown on initial load; click reveals the rest
   tag?: string;
   hoverTag?: string;
   clickable?: boolean;     // shorthand when using names[]
@@ -21,6 +22,7 @@ const { layers, scale = 1, href, title } = Astro.props;
 
 const loaded = layers.map((l) => {
   const names = l.names ?? (l.name ? [l.name] : []);
+  const defaultNames = l.defaultNames ?? names;
   // Load frame data from first name (all must share same layout)
   const sprite = loadSprite(names[0]);
   const defaultFrames: SpriteFrame[] = l.tag
@@ -31,6 +33,7 @@ const loaded = layers.map((l) => {
     : defaultFrames;
   return {
     names,
+    defaultNames,
     clickable: !!(l.clickable || (l.names && l.names.length > 1)),
     defaultFrames,
     hoverFrames,
@@ -68,14 +71,14 @@ const id = `ls-${Math.random().toString(36).slice(2, 8)}`;
     const layerEls = Array.from(wrapper.querySelectorAll("[data-layer]"));
     if (!layerEls.length) return;
 
-    // Per-layer name index for clickable layers — randomize on load
-    const nameIndexes = loaded.map((layer) =>
-      layer.clickable && layer.names.length > 1
-        ? Math.floor(Math.random() * layer.names.length)
-        : 0
-    );
+    // Per-layer name index for clickable layers — randomize on load from defaultNames only
+    const nameIndexes = loaded.map((layer) => {
+      if (!layer.clickable || layer.names.length <= 1) return 0;
+      const pickedName = layer.defaultNames[Math.floor(Math.random() * layer.defaultNames.length)];
+      return layer.names.indexOf(pickedName);
+    });
 
-    // Apply initial random hat
+    // Apply initial hat
     layerEls.forEach((el, i) => {
       if (loaded[i].clickable) {
         el.style.backgroundImage = `url('/images/sprites/${loaded[i].names[nameIndexes[i]]}.png')`;

@@ -2,11 +2,13 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const skills = [
-  { category: "Languages", items: ["Python", "TypeScript", "JavaScript"] },
-  { category: "Backend", items: ["FastAPI", "Flask", "Node.js"] },
+  { category: "Languages", items: ["Python", "TypeScript", "JavaScript", "C#", "C++"] },
+  { category: "Backend", items: ["FastAPI", "Flask", "Node.js", ".NET"] },
   { category: "Frontend", items: ["Astro", "React", "Tailwind CSS"] },
-  { category: "Infrastructure", items: ["Docker", "Nginx", "Linux", "Hetzner"] },
-  { category: "Data", items: ["PostgreSQL", "AWS", "pandas"] },
+  { category: "Infrastructure", items: ["Pulumi", "Docker", "Nginx", "Linux"] },
+  { category: "Cloud", items: ["AWS", "GCS", "Hetzner", "delta.blue"] },
+  { category: "Data", items: ["PostgreSQL", "pandas"] },
+  { category: "IoT", items: ["ESP32", "Raspberry Pi", "MQTT", "KiCad"] },
 ];
 ---
 
@@ -28,20 +30,31 @@ const skills = [
       <div class="space-y-4 text-neutral-700 dark:text-neutral-300 leading-relaxed">
         <!-- TODO: Replace with your own bio -->
         <p>
-          Hey, I'm André — a developer and photographer based in Germany, originally from Portugal and Brazil.
-          I'm interested in building useful software, self-hosting infrastructure, and keeping things simple.
+          Hey, I'm André, a mechanical engineer, developer, and photographer based in Germany, born and raised in Évora, Portugal.
+          I’ve mostly been working in the rail/transport space.
+          I'm interested in building useful things (sometimes also pointless things).
         </p>
         <p>
-          I spend a lot of time thinking about privacy, open source software, and how to own my own data.
-          When I'm not in front of a screen, I'm usually behind a camera — mostly analog.
-        </p>
+          I’m really into public transportation and how it can make cities more fair, more livable, and less dependent on cars.
+           I’ve done work with <a href="https://www.bahn.com" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] underline">Deutsche Bahn</a>, 
+           <a href="https://www.bvg.de" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] underline">BVG Berlin</a>, 
+           <a href="https://www.alstom.com/alstom-austria" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] underline">Alstom</a>, and the 
+           <a href="https://www.gov.uk/government/organisations/department-for-transport" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] underline">UK Department for Transport</a>.
         <p>
-          <!-- TODO: Fill in your current role / what you're working on -->
-          Currently working on: <span class="text-[var(--color-accent)]"><!-- your focus here --></span>
+          Currently working at <a href="https://incrementalsolutions.co.uk/" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] underline">Incremental Solutions</a>, a railway solutions company based in York.
         </p>
       </div>
     </section>
-
+    
+    <!-- Interests -->
+    <section>
+      <h2 class="text-lg font-semibold mb-4">Interests</h2>
+      <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+        I'm drawn to systems and how they connect — <span class="text-[var(--color-accent)]">public transport</span>, <span class="text-[var(--color-accent)]">self-hosting</span>, <span class="text-[var(--color-accent)]">open source</span>, <span class="text-[var(--color-accent)]">self-sustainability</span>, <span class="text-[var(--color-accent)]">agriculture</span>, <span class="text-[var(--color-accent)]">energy</span>, <span class="text-[var(--color-accent)]">local infrastructure</span>, <span class="text-[var(--color-accent)]">film photography</span>. Anything that gives people more ownership over the things they depend on.
+      </p>
+    </div>
+    </section>
+    
     <!-- Skills -->
     <section class="mb-12">
       <h2 class="text-lg font-semibold mb-6">Skills & tools</h2>
@@ -67,27 +80,15 @@ const skills = [
       <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed">
         I shoot mostly film — 35mm and medium format. You can find my photos at{" "}
         <a
-          href="https://photos.andreweigel.me"
+          href="https://www.youtube.com/watch?v=ZIYIm7lgUJU"
           target="_blank"
           rel="noopener"
           class="text-[var(--color-accent)] hover:underline"
         >
-          photos.andreweigel.me
-        </a>.
+          photos.andreweigel.me</a>.
         <!-- TODO: Update if the URL is different, or remove if not ready yet -->
       </p>
     </section>
 
-    <!-- Interests -->
-    <section>
-      <h2 class="text-lg font-semibold mb-4">Interests</h2>
-      <ul class="space-y-2 text-neutral-700 dark:text-neutral-300">
-        <!-- TODO: Personalise this list -->
-        <li>→ Self-hosting & privacy-first software</li>
-        <li>→ Open source</li>
-        <li>→ Analog photography</li>
-        <li>→ Linux & home servers</li>
-      </ul>
-    </section>
   </div>
 </BaseLayout>
